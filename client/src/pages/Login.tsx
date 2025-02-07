@@ -1,7 +1,16 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { assets } from '../assets/assets'
+import { useNavigate } from 'react-router-dom'
+import { AppContent } from '../context/AppContext'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 function Login() {
+
+  const navigate = useNavigate()
+
+  const { backendUrl, setIsLoggedin, getUserData } = useContext(AppContent);
+
 
   const [state, setState] = useState('Sign Up')
 
@@ -14,10 +23,46 @@ function Login() {
   const [phoneLada, setPhoneLada] = useState('')
   const [phone, setPhone] = useState('')
 
+  const onSubitHandler = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault();
+
+      axios.defaults.withCredentials = true
+
+      if (state === 'Sign Up') {
+        const {data} = await axios.post(backendUrl + '/api/auth/register', 
+        {name, surname, country, birthday, email, password, phoneLada, phone})
+
+        if (data.success) {
+          setIsLoggedin(true)
+          getUserData()
+          navigate('/')
+        }else{
+          toast.error(data.message)
+        }
+      }else{
+        const {data} = await axios.post(backendUrl + '/api/auth/login', 
+          { email, password })
+  
+          if (data.success) {
+            setIsLoggedin(true)
+            getUserData()
+            navigate('/')
+          }else{
+            toast.error(data.message)
+          }
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
   return (
     <div className='flex items-center justify-center min-h-screen px-6
     sm:px-0 bg-gradient-to-br from-blue-200 to-purple-400'>
-      <img src={assets.logo} alt="" className='absolute left-5 sm:left-20
+      <img onClick={
+        ()=> navigate('/')
+      } src={assets.logo} alt="" className='absolute left-5 sm:left-20
       top-5 w-28 sm:w-32 cursor-pointer'/>
       <div className='bg-slate-900 p-10 rounded-lg shadow-lg w-full sm:w-96
       text-indigo-300 text-sm'>
@@ -28,7 +73,7 @@ function Login() {
         <p className='text-center text-sm mb-6'>
           {state === 'Sign Up' ? 'Create your account' : 'Login to your account!'}</p>
 
-        <form>
+        <form onSubmit={onSubitHandler}>
           {state === 'Sign Up' && (
             // Nombre
             <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5
@@ -47,8 +92,9 @@ function Login() {
             <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5
             rounded-full bg-[#333A5C]'>
             <img src={assets.person_icon} alt="" />
-            <input
-            className='bg-transparent outline-none' type="text" placeholder='Surname' autoComplete="family-name" required/>
+            <input onChange={e => setSurname(e.target.value)}
+              value={surname}
+              className='bg-transparent outline-none' type="text" placeholder='Surname' autoComplete="family-name" required/>
             </div>
           )}
 
@@ -57,7 +103,9 @@ function Login() {
           <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5
           rounded-full bg-[#333A5C]'>
             <img src={assets.mail_icon} alt="" />
-            <select className="bg-transparent outline-none" name="" id="">
+            <select onChange={e => setCountry(e.target.value)} 
+                value={country} 
+            className="bg-transparent outline-none" name="" id="">
             <option value="">Select Country</option>
             <option value="USA">United States</option>
             <option value="CAN">Canada</option>
@@ -71,7 +119,9 @@ function Login() {
           <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5
           rounded-full bg-[#333A5C]'>
             <img src={assets.person_icon} alt="" />
-            <input className='bg-transparent outline-none' type="date" placeholder='Birthday' required/>
+            <input onChange={e => setBirthday(e.target.value)}
+              value={birthday}
+            className='bg-transparent outline-none' type="date" placeholder='Birthday' required/>
           </div>
           )}
 
@@ -79,14 +129,18 @@ function Login() {
           <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5
           rounded-full bg-[#333A5C]'>
             <img src={assets.mail_icon} alt="" />
-            <input className='bg-transparent outline-none' type="email" placeholder='Email' autoComplete="email" required/>
+            <input onChange={e => setEmail(e.target.value)}
+              value={email}
+            className='bg-transparent outline-none' type="email" placeholder='Email' autoComplete="email" required/>
           </div>
 
           // Password
           <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5
           rounded-full bg-[#333A5C]'>
             <img src={assets.lock_icon} alt="" />
-            <input className='bg-transparent outline-none' type="password" placeholder='Password' required/>
+            <input onChange={e => setPassword(e.target.value)}
+              value={password}
+            className='bg-transparent outline-none' type="password" placeholder='Password' required/>
           </div>
 
           {state === 'Sign Up' && (
@@ -94,7 +148,9 @@ function Login() {
           <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5
           rounded-full bg-[#333A5C]'>
             <img src={assets.mail_icon} alt="" />
-            <select className="bg-transparent outline-none" name="" id="" autoComplete="tel-national" required>
+            <select onChange={e => setPhoneLada(e.target.value)}
+              value={phoneLada}
+            className="bg-transparent outline-none" name="" id="" autoComplete="tel-national" required>
             <option value="">Select Lada</option>
             <option value="+1">USA, Canada</option>
             <option value="+52">Mexico</option>
@@ -108,11 +164,15 @@ function Login() {
           <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5
           rounded-full bg-[#333A5C]'>
             <img src={assets.mail_icon} alt="" />
-            <input className='bg-transparent outline-none' type="text" placeholder='Phone' autoComplete="tel" required/>
+            <input onChange={e => setPhone(e.target.value)}
+              value={phone}
+            className='bg-transparent outline-none' type="text" placeholder='Phone' autoComplete="tel" required/>
           </div>
           )}
 
-          <p className='mb-4 text-indigo-500 cursor-pointer'>Forgot password?</p>
+          <p onClick={
+            ()=> navigate('/reset-password')
+          } className='mb-4 text-indigo-500 cursor-pointer'>Forgot password?</p>
 
           <button className='w-full py-2.5 rounded-full bg-gradient-to-r
           from-indigo-500 to-indigo-900 text-white font-medium'>{state}</button>

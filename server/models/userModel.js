@@ -1,3 +1,79 @@
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../config/postgresdb.js';
+
+const User = sequelize.define('User', {
+    id: {
+    type: DataTypes.BIGINT,
+    autoIncrement: true,
+    primaryKey: true,
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    surname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    country: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    birth_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    phone_lada: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            is: /^\+(\d{1,4})$/
+        }
+    },
+    phone_number: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            is: /^\d{10}$/
+        }
+    },
+    verify_otp: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+    },
+    verify_otp_expire_at: {
+        type: DataTypes.BIGINT,
+        defaultValue: 0,
+    },
+    is_account_verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+    reset_otp: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+    },
+    reset_otp_expire_at: {
+        type: DataTypes.BIGINT,
+        defaultValue: 0,
+    },
+    auth_token: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    }
+});
+
+export default User;
+/*
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -32,3 +108,4 @@ const userSchema = new mongoose.Schema({
 const userModel = mongoose.models.user || mongoose.model('users', userSchema);
 
 export default userModel;
+*/

@@ -1,26 +1,31 @@
 import jwt from "jsonwebtoken";
 
 const userAuth = async (req, res, next)=>{
+    console.log("Cookies recibidas:", req.cookies); // <-- DEBUG
+    
     const {token} = req.cookies;
 
     if (!token) {
+        console.log("No se recibió token en cookies.");
         return res.json({ success: false, message: 'Not Authorized. Login Again'})
     }
 
     try {
-
         const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("Token decodificado:", tokenDecode); // <-- DEBUG
 
         if(tokenDecode.id){
-        req.body.userId = tokenDecode.id
+            req.userID = Number (tokenDecode.id);
+            console.log("req.userID asignado:", req.userID);
+            next();
         }else{
-        return res.json({ success: false, message: 'Not Authorized. Login Again'});
+            console.log("ID no encontrado en token.");
+            return res.status(401).json({ success: false, message: "Not Authorized. Login Again" });
         }
 
-        next();
-
     } catch (error) {
-        res.json({success: false, message: error.message});
+        console.error("Error al verificar el token:", error.message);
+        return res.status(401).json({ success: false, message: "Invalid Token" });
     }
 }
 
