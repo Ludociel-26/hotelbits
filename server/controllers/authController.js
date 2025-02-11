@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 import transporter from '../config/nodemailer.js';
 import { EMAIL_VERIFY_TEMPLATE, PASSWORD_RESET_TEMPLATE } from '../config/emailTemplates.js';
+import logger from '../logger.js';
 
 // Registro de usuario
 export const register = async (req, res) => {
@@ -65,6 +66,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
+        console.log('Missing email or password in login attempt');
         return res.json({ success: false, message: 'Email and password are required' });
     }
     try {

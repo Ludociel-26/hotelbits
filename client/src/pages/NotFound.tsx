@@ -1,37 +1,33 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-const NotFound = () => {
+export default function NotFound() {
+  const [theme, setTheme] = useState<string>("light");
+
+  // Cambia el tema al cargar la página o al cambiar la preferencia
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';  // Cargar el tema guardado o 'light' por defecto
+    setTheme(savedTheme);
+    document.documentElement.classList.add(savedTheme);  // Aplicar la clase en <html>
+  }, []);
+
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>404</h1>
-      <p style={styles.message}>Página no encontrada</p>
-      <Link to="/" style={styles.button}>Volver al inicio</Link>
+    <div className="container">
+      <div className="gradientOverlay"></div>
+      <div className="content">
+        <button className="waitlistButton">Oops!</button>
+        <div className="errorNumber">404</div>
+        <h1 className="errorText">
+          <span className="textHighlight">Page Not </span>
+          <span className="textHighlight">Found!</span>
+        </h1>
+        <Link to="/">
+          <button className="backButton">Back home</button>
+        </Link>
+      </div>
+      <footer className="footer">
+        ©2025 Todos los derechos reservados para • <span className="footerHighlight">HotelBits</span>
+      </footer>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    textAlign: 'center',
-    marginTop: '50px',
-  },
-  title: {
-    fontSize: '72px',
-    fontWeight: 'bold',
-    color: '#ff4757',
-  },
-  message: {
-    fontSize: '20px',
-    marginBottom: '20px',
-  },
-  button: {
-    padding: '10px 20px',
-    backgroundColor: '#ff4757',
-    color: '#fff',
-    textDecoration: 'none',
-    borderRadius: '5px',
-  },
-};
-
-export default NotFound;
+}
