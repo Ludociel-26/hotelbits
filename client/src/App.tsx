@@ -7,10 +7,10 @@ import Home from './pages/Home'
 import Habitaciones from './pages/Habitaciones'
 import EmailVerify from './pages/EmailVerify'
 import ResetPassword from './pages/ResetPassword'
-import Dashboard from './pages/Dashboard'
 import NotFound from './pages/NotFound'
 import Ubicacion from './pages/Ubicacion';
 import Servicios from './pages/Servicios';
+import { Dashboard } from './pages/dashboard/dashboard';
 
 
 function App() {
@@ -19,13 +19,13 @@ function App() {
       <ToastContainer/>
       <Routes>
       <Route path='/' element={<Home/>}/>
+      <Route path='/dashboard' element={<Dashboard/>}/>
       <Route path='/habitaciones' element={<Habitaciones/>}/>
       <Route path='/servicios' element={<Servicios/>}/>
       <Route path='/ubicacion' element={<Ubicacion/>}/>
       <Route path='/login' element={<Login/>}/>
       <Route path='/email-verify' element={<EmailVerify/>}/>
       <Route path='/reset-password' element={<ResetPassword/>}/>
-      <Route path='/dashboard' element={<Dashboard/>}/>
       <Route path='*' element={<NotFound/>}/>
       </Routes>
     </div>
