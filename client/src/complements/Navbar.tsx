@@ -115,7 +115,7 @@ function UserMenu({ userData, logout, sendVerificationOtp }) {
     <div className="relative group">
       <button style={buttonStyle}>{userData.name[0]}</button>
       <div className="absolute hidden group-hover:block bg-black/50 backdrop-blur-md p-2 mt-2 rounded-lg">
-        {!userData.isVerified && <button onClick={sendVerificationOtp} style={buttonStyle}>Validar Correo</button>}
+        {!userData.isAccountVerified && <button onClick={sendVerificationOtp} style={buttonStyle}>Validar Correo</button>}
         <button onClick={logout} style={buttonPrimary}>Cerrar Sesión</button>
       </div>
     </div>

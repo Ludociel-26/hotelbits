@@ -1,11 +1,13 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/postgresdb.js';
+import Role from './role.js';
+import NivelFidelizacion from './nivelFidelizacion.js';
 
 const User = sequelize.define('User', {
     id: {
-    type: DataTypes.BIGINT,
-    autoIncrement: true,
-    primaryKey: true,
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
     },
     name: {
         type: DataTypes.STRING,
@@ -26,7 +28,7 @@ const User = sequelize.define('User', {
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        unique: true,  // Garantiza que los correos sean únicos
     },
     password: {
         type: DataTypes.STRING,
@@ -36,15 +38,15 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            is: /^\+(\d{1,4})$/
-        }
+            is: /^\+(\d{1,4})$/,
+        },
     },
     phone_number: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            is: /^\d{10}$/
-        }
+            is: /^\d{10}$/,
+        },
     },
     verify_otp: {
         type: DataTypes.STRING,
@@ -69,10 +71,15 @@ const User = sequelize.define('User', {
     auth_token: {
         type: DataTypes.STRING,
         allowNull: true,
-    }
+    },
 });
 
+// Relaciones
+User.belongsTo(Role, { foreignKey: 'rol_id', allowNull: false });
+User.belongsTo(NivelFidelizacion, { foreignKey: 'nivel_fidelizacion_id', allowNull: false });
+
 export default User;
+
 /*
 import mongoose from "mongoose";
 

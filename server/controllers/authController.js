@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 import transporter from '../config/nodemailer.js';
-import { EMAIL_VERIFY_TEMPLATE, PASSWORD_RESET_TEMPLATE } from '../config/emailTemplates.js';
+import { EMAIL_WELCOME_TEMPLATE, EMAIL_VERIFY_TEMPLATE, PASSWORD_RESET_TEMPLATE } from '../config/emailTemplates.js';
 import logger from '../logger.js';
 
 // Registro de usuario
@@ -46,11 +46,11 @@ export const register = async (req, res) => {
 
     // Enviar correo de bienvenida
     const mailOptions = {
-        from: `"Hotel" <${process.env.SENDER_EMAIL}>`,
+        from: `"🏨HotelBits" <${process.env.SENDER_EMAIL}>`,
         to: email,
-        subject: 'Welcome to Hotel',
-        text: `Welcome to Hotel website. Your account has been created with email id: ${email}`,
-        html: `<h1>Welcome to Hotel</h1><p>Your account has been created with email id: ${email}</p>`
+        subject: '✨ Te damos la bienvenida a HotelBits 🏨',
+        // text: `Welcome to Hotel website. Your account has been created with email id: ${email}`,
+        html: EMAIL_WELCOME_TEMPLATE.replace("{{name}}", user.name).replace("{{email}}", user.email)
     };
 
     await transporter.sendMail(mailOptions);
@@ -142,13 +142,14 @@ export const sendVerifyOtp = async (req, res) => {
         user.verify_otp = otp;
         user.verify_otp_expire_at = Date.now() + 24 * 60 * 60 * 1000; // 24 horas
 
+        // Enviar correo para validar correo por OTP
         await user.save();
         const mailOption = {
-            from: process.env.SENDER_EMAIL,
+            from: `"✉️ Verifica email de contacto en 🏨HotelBits"<${process.env.SENDER_EMAIL}>`,
             to: user.email,
-            subject: 'Account Verification OTP',
+            subject: '🔐 Protege tu cuenta: verifica tu email ahora',
             // text: `Your OTP is ${otp}. Verify your account using this OTP.`,
-            html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email)
+            html: EMAIL_VERIFY_TEMPLATE.replace("{{name}}", user.name).replace("{{email}}", user.email).replace("{{otp}}", otp)
         };
         await transporter.sendMail(mailOption);
 
@@ -224,11 +225,11 @@ export const sendResetOtp = async (req, res) => {
         await user.save();
 
         const mailOption = {
-            from: process.env.SENDER_EMAIL,
+            from: `"Solicitud de restablecimiento de contraseña de tu cuenta de 🏨HotelBits"<${process.env.SENDER_EMAIL}>`,
             to: user.email,
-            subject: 'Password Reset OTP',
+            subject: 'Cambia tu contraseña de forma segura',
             // text: `Your OTP for resetting your password is ${otp}. Use this OTP to proceed with resetting your password.`
-            html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email)
+            html: PASSWORD_RESET_TEMPLATE.replace("{{name}}", user.name).replace("{{email}}", user.email).replace("{{otp}}", otp)
         };
 
         await transporter.sendMail(mailOption);

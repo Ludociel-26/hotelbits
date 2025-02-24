@@ -1,16 +1,30 @@
 import Sequelize from 'sequelize';
+import dotenv from 'dotenv';
+dotenv.config();
+
+console.log("🔍 Cargando configuración de Sequelize...");
 
 const sequelize = new Sequelize(process.env.POSTGRES_URI, {
     dialect: 'postgres',
     logging: false, // Puedes habilitar el logging si lo deseas
 });
 
+console.log("✅ Sequelize inicializado correctamente.");
+
 const connectDB = async () => {
     try {
         await sequelize.authenticate();
-        console.log("Database Connected");
+        console.log("✅ Database Connected");
+
+        // Agregar logs para verificar modelos
+        console.log("🔍 Importando modelos...");
+        await import('../models/index.js');
+        console.log("✅ Modelos importados correctamente.");
+
+        await sequelize.sync({ alter: true }); // <-- Actualizará las tablas si es necesario
+        console.log("✅ Modelos sincronizados con la base de datos");
     } catch (error) {
-        console.error("Unable to connect to the database:", error);
+        console.error("❌ Unable to connect to the database:", error);
     }
 };
 

@@ -1,0 +1,10 @@
+import './role.js';
+import './nivelFidelizacion.js';
+import './metodoPago.js';
+import './estadoReserva.js';
+import './tipoHabitacion.js';
+import './estadoHabitacion.js';
+import './piso.js';
+import './habitacion.js';
+import './reserva.js';
+import './userModel.js';
