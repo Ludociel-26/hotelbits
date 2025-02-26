@@ -26,10 +26,20 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ name, surname, country, birth_date, email, password: hashedPassword, phone_lada, phone_number });
+    const user = await User.create({ 
+        name, 
+        surname, 
+        country, 
+        birth_date, 
+        email, 
+        password: hashedPassword, 
+        phone_lada, 
+        phone_number,
+        rol_id: 1  // Asigna el rol por defecto
+    });
 
     // Genera el token JWT
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user.id, role: user.rol_id}, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     // Guarda el token en el campo auth_token
     user.auth_token = token;
@@ -80,7 +90,7 @@ export const login = async (req, res) => {
             return res.json({ success: false, message: 'Invalid password' });
         }
 
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: user.id, role: user.rol_id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -89,7 +99,7 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-        return res.json({ success: true });
+        return res.json({ success: true, role: user.rol_id });
 
     } catch (error) {
         return res.json({ success: false, message: error.message });

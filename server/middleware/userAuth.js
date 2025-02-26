@@ -16,7 +16,9 @@ const userAuth = async (req, res, next)=>{
 
         if(tokenDecode.id){
             req.userID = Number (tokenDecode.id);
+            req.userRole = tokenDecode.role;
             console.log("✅ req.userID asignado:", req.userID);
+            console.log("Rol del usuario:", req.userRole); // Para depuración
             next();
         }else{
             console.log("❌ ID no encontrado en token.");

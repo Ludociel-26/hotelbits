@@ -2,80 +2,88 @@ import axios from "axios";
 import { createContext, useState, ReactNode, useEffect } from "react";
 import { toast } from "react-toastify";
 
+// Definir el tipo de usuario con el rol incluido
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  role: number; // Aseguramos que el rol siempre está presente
+}
+
 // Definir el tipo de contexto
 interface AppContextType {
   backendUrl: string;
   isLoggedin: boolean;
   setIsLoggedin: (value: boolean) => void;
-  userData: { id: string; name: string; email: string } | null;
-  setUserData: (value: { id: string; name: string; email: string } | null) => void;
+  userData: UserData | null;
+  setUserData: (value: UserData | null) => void;
   theme: string;
-  toggleTheme: () => void; // Función para cambiar el tema
-  getUserData: () => void;
+  toggleTheme: () => void; 
+  getUserData: () => Promise<void>;
 }
 
 // Crear el contexto con un valor por defecto
 export const AppContent = createContext<AppContextType | undefined>(undefined);
 
-// Definir el tipo de props para el proveedor
 interface AppContextProviderProps {
   children: ReactNode;
 }
 
 export const AppContextProvider = ({ children }: AppContextProviderProps) => {
-
   axios.defaults.withCredentials = true;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL as string; 
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL as string; // Asegurar que es string
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
-  const [userData, setUserData] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [theme, setTheme] = useState<string>('light'); 
 
-  // Manejo del tema
-  const [theme, setTheme] = useState<string>('light'); // Estado para almacenar el tema
-
-  // Función para alternar entre el tema claro/oscuro
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme); // Guardar la preferencia en localStorage
-    document.documentElement.className = newTheme; // Cambiar la clase del <html>
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.className = newTheme;
   };
 
-  // Obtener el tema almacenado
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       setTheme(savedTheme);
-      document.documentElement.className = savedTheme; // Aplicar el tema al cargar
+      document.documentElement.className = savedTheme;
     } else {
-      // Si no hay tema almacenado, ajustamos al sistema
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       setTheme(systemTheme);
-      document.documentElement.className = systemTheme; // Aplicar el tema
+      document.documentElement.className = systemTheme;
     }
   }, []);
 
+  // Función para verificar si el usuario está autenticado y obtener sus datos
   const getAuthState = async () => {
     try {
-      const {data} = await axios.get(backendUrl + '/api/auth/is-auth')
+      const { data } = await axios.get(`${backendUrl}/api/auth/is-auth`);
       if (data.success) {
-        setIsLoggedin(true)
-        getUserData()
+        setIsLoggedin(true);
+        getUserData();
       }
-    } catch (error) {
-      toast.error(error.message)
+    } catch (error: any) {
+      toast.error(error.message);
     }
-  }
+  };
 
+  // Función para obtener la información del usuario incluyendo el rol
   const getUserData = async () => {
     try {
-      const { data } = await axios.get(backendUrl + '/api/user/data');
+      const { data } = await axios.get(`${backendUrl}/api/user/data`);
       if (data.success) {
-        setUserData(data.userData);
+        setUserData(data.userData); 
+        setIsLoggedin(true);
       } else {
+        setUserData(null);
+        setIsLoggedin(false);
         toast.error(data.message);
       }
-    } catch (error) {
+    } catch (error: any) {
+      setUserData(null);
+      setIsLoggedin(false);
       toast.error(error.message);
     }
   };
@@ -86,18 +94,14 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
 
   const value: AppContextType = {
     backendUrl,
-    isLoggedin, 
+    isLoggedin,
     setIsLoggedin,
-    userData, 
+    userData,
     setUserData,
     theme,
-    toggleTheme, // Pasar la función para alternar el tema
+    toggleTheme,
     getUserData
   };
 
-  return (
-    <AppContent.Provider value={value}>
-      {children}
-    </AppContent.Provider>
-  );
+  return <AppContent.Provider value={value}>{children}</AppContent.Provider>;
 };

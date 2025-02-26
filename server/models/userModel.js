@@ -72,11 +72,21 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    rol_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1  // Valor por defecto
+    },
+    nivel_fidelizacion_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null
+    }
 });
 
 // Relaciones
-User.belongsTo(Role, { foreignKey: 'rol_id', allowNull: false });
-User.belongsTo(NivelFidelizacion, { foreignKey: 'nivel_fidelizacion_id', allowNull: false });
+User.belongsTo(Role, { foreignKey: 'rol_id'});
+User.belongsTo(NivelFidelizacion, { foreignKey: 'nivel_fidelizacion_id'});
 
 export default User;
 

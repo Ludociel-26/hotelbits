@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from '../complements/Navbar'
 import Header from '../complements/Header'
 import { Footer } from '../complements/Footer'
@@ -6,8 +6,20 @@ import { Features } from '../complements/Features'
 import { Hero } from '../complements/Hero'
 import { Rooms } from '../complements/Rooms'
 import { Testimonial } from '../complements/Testimonial'
+import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+
 
 const Home = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Verificar si se pasó el estado "noAccess" desde la redirección
+    if (location.state?.noAccess) {
+      toast.error("🚫 No tienes permisos para acceder a esta página.");
+    }
+  }, [location]);
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary dark:from-background dark:to-secondary pt-20">
       <Navbar/>
