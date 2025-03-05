@@ -1,5 +1,5 @@
 import jsPDF from "jspdf"
-import "jspdf-autotable"
+import autoTable from "jspdf-autotable"
 import * as XLSX from "xlsx"
 import html2canvas from "html2canvas"
 
@@ -59,7 +59,7 @@ async function exportDashboardToPDF(doc: jsPDF) {
 
   // Tabla de reservaciones
   const reservationsData = getReservationsTableData()
-  doc.autoTable({
+  autoTable(doc, {
     head: [["ID", "Huésped", "Habitación", "Entrada", "Salida", "Estado", "Total"]],
     body: reservationsData,
     startY: 10,
@@ -69,7 +69,7 @@ async function exportDashboardToPDF(doc: jsPDF) {
 }
 
 async function exportReservationsToPDF(doc: jsPDF, data: any[]) {
-  doc.autoTable({
+  autoTable(doc, {
     head: [["ID", "Huésped", "Habitación", "Entrada", "Salida", "Estado", "Total"]],
     body: data.map((r) => [
       r.reserva_id,

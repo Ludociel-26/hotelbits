@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { AppContent } from '../context/AppContext';
@@ -9,7 +9,11 @@ import { assets } from '../assets/assets';
 
 function Navbar() {
   const navigate = useNavigate();
-  const { userData, backendUrl, setUserData, setIsLoggedin } = useContext(AppContent);
+  const context = useContext(AppContent);
+  if (!context) {
+    throw new Error("AppContent debe estar dentro de AppContextProvider");
+  }
+  const { userData, backendUrl, setUserData, setIsLoggedin } = context;
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -35,7 +39,11 @@ function Navbar() {
       const { data } = await axios.post(`${backendUrl}/api/auth/send-verify-otp`);
       data.success ? (navigate('/email-verify'), toast.success(data.message)) : toast.error(data.message);
     } catch (error) {
-      toast.error(error.message);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Ocurrió un error inesperado");
+      }
     }
   };
 
@@ -49,7 +57,11 @@ function Navbar() {
         navigate('/');
       }
     } catch (error) {
-      toast.error(error.message);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Ocurrió un error inesperado");
+      }
     }
   };
 
@@ -61,7 +73,7 @@ function Navbar() {
         
         {!isMobile && (
           <nav className="flex items-center gap-4">
-            <NavLinks />
+            <NavLinks mobile={false} toggleMenu={closeMenu} />
             <ThemeToggle toggleTheme={toggleDarkMode} darkMode={darkMode} />
             {userData ? <UserMenu userData={userData} logout={logout} sendVerificationOtp={sendVerificationOtp} /> :
               <a href="/login" style={buttonPrimary}>Iniciar Sesión</a>}
@@ -80,7 +92,7 @@ function Navbar() {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-black/50 backdrop-blur-md">
             <nav className="mx-auto px-4 py-4 flex flex-col gap-4">
-              <NavLinks mobile toggleMenu={closeMenu} />
+              <NavLinks mobile={true} toggleMenu={closeMenu} />
               <ThemeToggle toggleTheme={toggleDarkMode} darkMode={darkMode} />
               {userData ? <UserMenu userData={userData} logout={logout} sendVerificationOtp={sendVerificationOtp} /> :
                 <a href="/login" style={buttonPrimary}>Iniciar Sesión</a>}
@@ -92,17 +104,17 @@ function Navbar() {
   );
 }
 
-function NavLinks({ mobile = false, toggleMenu }) {
+function NavLinks({ mobile = false, toggleMenu }: { mobile?: boolean; toggleMenu: () => void }) {
   return (
-    <>
+    <div className={`flex ${mobile ? "flex-col gap-2" : "flex-row gap-5"}`}>
       <a href="/habitaciones" onClick={toggleMenu} style={buttonStyle}>Habitaciones</a>
       <a href="/servicios" onClick={toggleMenu} style={buttonStyle}>Servicios</a>
       <a href="/ubicacion" onClick={toggleMenu} style={buttonStyle}>Ubicación</a>
-    </>
+    </div>
   );
 }
 
-function ThemeToggle({ toggleTheme, darkMode }) {
+function ThemeToggle({ toggleTheme, darkMode }: { toggleTheme: () => void; darkMode: boolean }) {
   return (
     <motion.button onClick={toggleTheme} style={buttonStyle} animate={{ rotate: darkMode ? 180 : 0 }}>
       {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
@@ -110,12 +122,24 @@ function ThemeToggle({ toggleTheme, darkMode }) {
   );
 }
 
-function UserMenu({ userData, logout, sendVerificationOtp }) {
+function UserMenu({ 
+  userData, 
+  logout, 
+  sendVerificationOtp 
+}: { 
+  userData: { name: string; isAccountVerified: boolean }; 
+  logout: () => void; 
+  sendVerificationOtp: () => void;
+}) {
   return (
-    <div className="relative group">
-      <button style={buttonStyle}>{userData.name[0]}</button>
-      <div className="absolute hidden group-hover:block bg-black/50 backdrop-blur-md p-2 mt-2 rounded-lg">
-        {!userData.isAccountVerified && <button onClick={sendVerificationOtp} style={buttonStyle}>Validar Correo</button>}
+    <div style={buttonStyle} className="relative group">
+      <button style={buttonStyle} >{userData.name[0]}</button>
+      <div className="absolute right-0 mt-4 w-47 hidden group-hover:block bg-black/50 backdrop-blur-md p-2 rounded-lg">
+        {!userData.isAccountVerified && (
+          <button onClick={sendVerificationOtp} style={buttonStyle}>
+            Validar Correo
+          </button>
+        )}
         <button onClick={logout} style={buttonPrimary}>Cerrar Sesión</button>
       </div>
     </div>
@@ -132,7 +156,7 @@ const buttonStyle = {
   cursor: "pointer",
   backdropFilter: "blur(6px)",
   transition: "all 0.3s ease",
-  textAlign: "center",
+  textAlign: "center" as React.CSSProperties["textAlign"],
   display: "inline-block",
   margin: "4px 0",
 };

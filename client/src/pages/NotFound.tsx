@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function NotFound() {
-  const [theme, setTheme] = useState<string>("light");
-
-  // Cambia el tema al cargar la página o al cambiar la preferencia
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light';  // Cargar el tema guardado o 'light' por defecto
-    setTheme(savedTheme);
-    document.documentElement.classList.add(savedTheme);  // Aplicar la clase en <html>
+    const savedTheme = localStorage.getItem('theme') || 'light'; // Cargar el tema guardado o 'light' por defecto
+    document.documentElement.classList.add(savedTheme); // Aplicar la clase en <html>
   }, []);
-
   return (
     <div className="container">
       <div className="gradientOverlay"></div>

@@ -7,6 +7,7 @@ interface UserData {
   id: string;
   name: string;
   email: string;
+  isAccountVerified: boolean;
   role: number; // Aseguramos que el rol siempre está presente
 }
 
@@ -23,7 +24,7 @@ interface AppContextType {
 }
 
 // Crear el contexto con un valor por defecto
-export const AppContent = createContext<AppContextType | undefined>(undefined);
+export const AppContent = createContext<AppContextType | null>(null);
 
 interface AppContextProviderProps {
   children: ReactNode;

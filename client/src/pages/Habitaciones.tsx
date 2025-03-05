@@ -93,7 +93,7 @@ export default function HabitacionesPage() {
           ))}
         </div>
       </div>
-      <Footer className="mt-auto" />
+      <Footer />
     </div>
   )
 }

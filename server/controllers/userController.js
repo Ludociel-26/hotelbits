@@ -22,6 +22,7 @@ export const getUserData = async (req, res) => {
           id: user.id,
           name: user.name,
           email: user.email,
+          isAccountVerified: user.is_account_verified,
           role: user.rol_id  // Aquí retornamos el rol del usuario
         }
       });

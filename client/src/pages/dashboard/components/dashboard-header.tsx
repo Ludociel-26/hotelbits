@@ -1,17 +1,11 @@
-"use client"
-
-import { Moon, Search, Settings, Sun, Download } from "lucide-react"
+import { Search, Download } from "lucide-react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { useTheme } from "next-themes"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { exportToPDF, exportToExcel } from "../lib/export-utils"
 import { toast } from "react-toastify"
 
 export function DashboardHeader() {
-  const { theme, setTheme } = useTheme()
-
   const handleExport = async (format: "pdf" | "excel") => {
     const loadingToast = toast.loading("Preparando exportación...")
 

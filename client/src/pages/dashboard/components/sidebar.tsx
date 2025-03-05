@@ -20,7 +20,7 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed, onToggle, transitionDuration = 300 }: SidebarProps) {
   const [shouldAutoCollapse, setShouldAutoCollapse] = useState(false)
-  const [pathname, setPathname] = useState(window.location.pathname)
+  const pathname = window.location.pathname
 
   // Función para manejar cambios de tamaño de ventana
   const handleResize = useCallback(() => {

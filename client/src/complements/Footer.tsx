@@ -1,6 +1,6 @@
-export function Footer() {
+export function Footer({ className = "" }: { className?: string }) {
     return (
-      <footer className="bg-zinc-900 text-white py-12">
+      <footer className={`bg-zinc-900 text-white py-12 ${className}`.trim()}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>

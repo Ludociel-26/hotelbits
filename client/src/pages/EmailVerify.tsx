@@ -8,25 +8,31 @@ import { useNavigate } from 'react-router-dom'
 const EmailVerify = () => {
 
   axios.defaults.withCredentials = true;
-  const {backendUrl, isLoggedin, userData, getUserData} = useContext(AppContent)
+  const context = useContext(AppContent);
+
+  if (!context) {
+    throw new Error("AppContent debe estar dentro de AppContextProvider");
+  }
+  
+  const { backendUrl, isLoggedin, userData, getUserData } = context;
 
   const navigate = useNavigate()
 
-  const inputRefs = React.useRef([])
+  const inputRefs = React.useRef<(HTMLInputElement | null)[]>([])
 
-  const handleInput = (e, index)=>{
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     if (e.target.value.length > 0 && index < inputRefs.current.length - 1) {
-      inputRefs.current[index + 1].focus();
+      inputRefs.current[index + 1]?.focus();
     }
   }
 
-  const handleKeyDown = (e, index) =>{
-    if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
-      inputRefs.current[index - 1].focus();
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) =>{
+    if (e.key === 'Backspace' && e.currentTarget.value === '' && index > 0) {
+      inputRefs.current[index - 1]?.focus();
     }
   }
 
-  const handlePaste = (e)=>{
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const paste = e.clipboardData.getData('text')
     const pasteArray = paste.split('');
     pasteArray.forEach((char, index)=>{
@@ -36,10 +42,10 @@ const EmailVerify = () => {
     })
   }
 
-  const onSubmitHandler = async (e) =>{
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) =>{
     try{
       e.preventDefault();
-      const otpArray = inputRefs.current.map(e => e.value)
+      const otpArray = inputRefs.current.map(e => e ?  e.value : "")
       const otp = otpArray.join('')
 
       const {data} = await axios.post(backendUrl + '/api/auth/verify-account', {otp})
@@ -52,7 +58,11 @@ const EmailVerify = () => {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error(error.message)
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error("Ocurrió un error inesperado")
+      }
     }
   }
 
@@ -69,10 +79,10 @@ const EmailVerify = () => {
         <p className='text-center mb-6 text-indigo-300'>Enter the 6-digit code sent to your email id.</p>
         <div className='flex justify-between mb-8' onPaste={handlePaste}>
           {Array(6).fill(0).map((_, index)=>(
-            <input type="text" maxLength='1' key={index} required
+            <input type="text" maxLength={1} key={index} required
             className='w-12 h-12 bg-[#333A5C] text-white text-center text-xl rounded-md'
             ref={e => inputRefs.current[index] = e}
-            onInput={(e) => handleInput(e, index) }
+            onChange={(e) => handleInput(e, index)}
             onKeyDown={(e)=> handleKeyDown(e, index)}
             />
           ))}

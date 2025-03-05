@@ -1,7 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion"
 import { useRef } from "react"
 import { Star } from "lucide-react"
-import { assets } from "../assets/assets"
 
 interface Room {
   title: string

@@ -15,7 +15,7 @@ export function Testimonial() {
   return (
     <div ref={ref} className="relative min-h-screen overflow-hidden">
       {/* Background Image */}
-      <motion.div className="absolute inset-0" style={{ scale }}>
+      <motion.div className="absolute inset-0" style={{ scale, opacity }}>
         <img
           src="/opiniones.jpg" // Reemplaza con una imagen del lobby de HotelBits
           alt="HotelBits Lobby"

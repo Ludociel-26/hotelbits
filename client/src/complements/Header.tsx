@@ -1,10 +1,16 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { assets } from '../assets/assets'
 import { AppContent } from '../context/AppContext'
 
 function Header() {
 
-  const {userData} = useContext(AppContent)
+  const context = useContext(AppContent);
+
+  if (!context) {
+    throw new Error("AppContent debe estar dentro de AppContextProvider");
+  }
+
+  const { userData } = context;
 
   return (
     <div className='flex flex-col items-center mt-20 px-4 text-center
